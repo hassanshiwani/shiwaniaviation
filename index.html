@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Voucher Travel Agency Accounting System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6; /* Light background */
+        }
+        /* Custom styles for glassmorphism effect */
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        /* Smooth fade transition */
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity 0.5s ease;
+        }
+        .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+            opacity: 0;
+        }
+         /* Custom styling for active sidebar link */
+        .sidebar-link.active {
+            background-color: #4a5568; /* bg-gray-700 */
+        }
+         /* Custom styling for top nav links */
+        .top-nav-link {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem; /* rounded */
+            transition: background-color 0.2s ease;
+        }
+        .top-nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+         /* Styling for report category cards */
+        .report-category-card {
+            background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .report-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            color: #3b82f6; /* text-blue-600 */
+            transition: color 0.2s ease;
+        }
+        .report-link:hover {
+            color: #2563eb; /* text-blue-700 */
+        }
+         /* Styling for the logo */
+        .company-logo {
+            height: 40px; /* Adjust height as needed */
+            margin-right: 1rem;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+
+    <div id="app" class="flex flex-1 flex-col">
+
+        <header class="bg-gray-800 text-white p-4 flex flex-col md:flex-row items-center justify-between">
+            <div class="flex items-center mb-4 md:mb-0">
+                <img src="https://placehold.co/40x40/ffffff/000000?text=Logo" onerror="this.onerror=null; this.src='https://placehold.co/40x40/ffffff/000000?text=Logo';" alt="Shiwani Travel & Tours Logo" class="company-logo">
+                <span class="text-lg font-semibold">SHIWANI TRAVEL & TOURS</span>
+            </div>
+            <nav class="flex flex-wrap justify-center md:justify-start space-x-2 md:space-x-4 text-sm">
+                <a href="#" @click.prevent="currentPage = 'finance-vouchers'" :class="{'active': currentPage === 'finance-vouchers'}" class="top-nav-link">Finance Vouchers</a>
+                <a href="#" @click.prevent="currentPage = 'ticket-voucher'" :class="{'active': currentPage === 'ticket-voucher'}" class="top-nav-link">Ticket Voucher</a>
+                <a href="#" @click.prevent="currentPage = 'hotel-vouchers'" :class="{'active': currentPage === 'hotel-vouchers'}" class="top-nav-link">Hotel Vouchers</a>
+                <a href="#" @click.prevent="currentPage = 'visa-voucher'" :class="{'active': currentPage === 'visa-voucher'}" class="top-nav-link">Visa Voucher</a>
+                <a href="#" @click.prevent="currentPage = 'package-voucher'" :class="{'active': currentPage === 'package-voucher'}" class="top-nav-link">Package Voucher</a>
+                <a href="#" @click.prevent="currentPage = 'other-voucher'" :class="{'active': currentPage === 'other-voucher'}" class="top-nav-link">Other Voucher</a>
+            </nav>
+            <div class="flex items-center mt-4 md:mt-0">
+                <span class="mr-2">Muhammad Hassan Shiwani (Admin)</span>
+                <i class="fas fa-user-circle text-2xl"></i>
+            </div>
+        </header>
+
+        <div class="flex flex-1 flex-col md:flex-row">
+            <aside class="w-full md:w-64 bg-gray-800 text-white p-4 md:p-6 flex flex-col">
+                 <div class="mb-6">
+                    <h2 class="text-xl font-semibold">Agency kt : 566</h2>
+                    <p class="text-sm text-gray-400">Expires On: Thu 01 Jan 1970</p>
+                    <p class="text-sm text-gray-400">Capital: PKR 200,000.00</p>
+                 </div>
+                <nav class="flex flex-col space-y-2 flex-1">
+                    <button @click="currentPage = 'home'" :class="{'active': currentPage === 'home'}" class="sidebar-link py-2 px-4 rounded hover:bg-gray-700 transition duration-200 text-left">Home</button>
+                    <button @click="currentPage = 'accounts'" :class="{'active': currentPage === 'accounts'}" class="sidebar-link py-2 px-4 rounded hover:bg-gray-700 transition duration-200 text-left">Accounts</button>
+                    <button @click="currentPage = 'financial-reports'" :class="{'active': currentPage === 'financial-reports'}" class="sidebar-link py-2 px-4 rounded hover:bg-gray-700 transition duration-200 text-left">Financial Reports</button>
+                    <button @click="currentPage = 'ticket-vouchers'" :class="{'active': currentPage === 'ticket-vouchers'}" class="sidebar-link py-2 px-4 rounded hover:bg-gray-700 transition duration-200 text-left">Ticket Vouchers</button>
+                    <button @click="currentPage = 'admin-panel'" :class="{'active': currentPage === 'admin-panel'}" class="sidebar-link py-2 px-4 rounded hover:bg-gray-700 transition duration-200 text-left">Admin Panel</button>
+                    <button @click="currentPage = 'chart-of-accounts'" :class="{'active': currentPage === 'chart-of-accounts'}" class="sidebar-link py-2 px-4 rounded hover:bg-gray-700 transition duration-200 text-left">Chart of Accounts</button>
+                    <button @click="currentPage = 'accounts-ledger'" :class="{'active': currentPage === 'accounts-ledger'}" class="sidebar-link py-2 px-4 rounded hover:bg-gray-700 transition duration-200 text-left">Accounts - Ledger</button>
+                    <button @click="currentPage = 'foreign-accounts'" :class="{'active': currentPage === 'foreign-accounts'}" class="sidebar-link py-2 px-4 rounded hover:bg-gray-700 transition duration-200 text-left">Foreign Accounts</button>
+                    <button @click="currentPage = 'trial-balance'" :class="{'active': currentPage === 'trial-balance'}" class="sidebar-link py-2 px-4 rounded hover:bg-gray-700 transition duration-200 text-left">Trial Balance</button>
+                     <button @click="currentPage = 'cash-activities'" :class="{'active': currentPage === 'cash-activities'}" class="sidebar-link py-2 px-4 rounded hover:bg-gray-700 transition duration-200 text-left">Cash Activities</button>
+                     <button @click="currentPage === 'closings'" :class="{'active': currentPage === 'closings'}" class="sidebar-link py-2 px-4 rounded hover:bg-gray-700 transition duration-200 text-left">Closings</button>
+                     <button @click="currentPage === 'add'" :class="{'active': currentPage === 'add'}" class="sidebar-link py-2 px-4 rounded hover:bg-gray-700 transition duration-200 text-left">Add</button>
+                </nav>
+                 <div class="pt-6">
+                     <button class="w-full py-2 px-4 bg-red-600 rounded hover:bg-red-700 transition duration-200 text-left">Logout</button>
+                </div>
+            </aside>
+
+            <main class="flex-1 p-4 md:p-8 overflow-y-auto">
+                <transition name="fade" mode="out-in">
+                    <div v-if="currentPage === 'home'" key="home">
+                        <h2 class="text-3xl font-semibold mb-6">Dashboard</h2>
+
+                         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8 text-center text-sm font-medium">
+                             <div class="bg-white p-4 rounded-lg shadow-md">CUSTOMERS<br><span class="text-blue-600">Report</span></div>
+                             <div class="bg-white p-4 rounded-lg shadow-md">BANKS<br><span class="text-blue-600">Report</span></div>
+                             <div class="bg-white p-4 rounded-lg shadow-md">AGENTS<br><span class="text-blue-600">Report</span></div>
+                             <div class="bg-white p-4 rounded-lg shadow-md">AIRLINES<br><span class="text-blue-600">Report</span></div>
+                             <div class="bg-white p-4 rounded-lg shadow-md">VISA HOTEL<br><span class="text-blue-600">Report</span></div>
+                             <div class="bg-white p-4 rounded-lg shadow-md">BSP<br><span class="text-blue-600">Report</span></div>
+                             <div class="bg-white p-4 rounded-lg shadow-md">TRIAL BALANCE<br><span class="text-blue-600">Report</span></div>
+                             <div class="bg-white p-4 rounded-lg shadow-md">TOP CUSTOMERS<br><span class="text-blue-600">Report</span></div>
+                             <div class="bg-white p-4 rounded-lg shadow-md">TOP SUPPLIER<br><span class="text-blue-600">Report</span></div>
+                             <div class="bg-white p-4 rounded-lg shadow-md">TOP AGENTS<br><span class="text-blue-600">Report</span></div>
+                             <div class="bg-white p-4 rounded-lg shadow-md">DAY WISE Sales Report<br><span class="text-blue-600">Report</span></div>
+                             <div class="bg-white p-4 rounded-lg shadow-md">YEARLY SALES<br><span class="text-blue-600">Report</span></div>
+                         </div>
+
+
+                        <h3 class="text-xl font-semibold mb-4">SALES ON : 03/08/2025</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                                <i class="fas fa-plane text-4xl text-blue-500 mb-3"></i>
+                                <h3 class="text-xl font-medium mb-2">Ticket Sales</h3>
+                                <p class="text-2xl font-bold text-gray-800">PKR 0</p>
+                                <a href="#" class="text-blue-600 text-sm mt-2 inline-block">View More</a>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                                <i class="fas fa-hotel text-4xl text-purple-500 mb-3"></i>
+                                <h3 class="text-xl font-medium mb-2">Hotel Sales</h3>
+                                <p class="text-2xl font-bold text-gray-800">PKR 127500.00</p>
+                                <a href="#" class="text-blue-600 text-sm mt-2 inline-block">View More</a>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                                <i class="fas fa-passport text-4xl text-yellow-500 mb-3"></i>
+                                <h3 class="text-xl font-medium mb-2">Visa Sales</h3>
+                                <p class="text-2xl font-bold text-gray-800">PKR 0</p>
+                                <a href="#" class="text-blue-600 text-sm mt-2 inline-block">View More</a>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                                <i class="fas fa-globe-asia text-4xl text-teal-500 mb-3"></i>
+                                <h3 class="text-xl font-medium mb-2">Grand Total</h3>
+                                <p class="text-2xl font-bold text-gray-800">PKR 127500</p>
+                                <a href="#" class="text-blue-600 text-sm mt-2 inline-block">View More</a>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div class="flex items-center">
+                                    <input type="text" placeholder="Search Ticket By Ticket No" class="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <button class="bg-blue-600 text-white p-2 rounded-r hover:bg-blue-700 transition duration-200">Search</button>
+                                </div>
+                                <div class="flex items-center">
+                                     <select class="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Select an account</option>
+                                        </select>
+                                      <button class="bg-blue-600 text-white p-2 rounded-r hover:bg-blue-700 transition duration-200">Search</button>
+                                </div>
+                                <div class="flex items-center">
+                                     <select class="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Consultant Sales</option>
+                                        </select>
+                                      <button class="bg-blue-600 text-white p-2 rounded-r hover:bg-blue-700 transition duration-200">Cons Wise</button>
+                                </div>
+
+                                <div class="flex items-center">
+                                    <input type="text" placeholder="Search Ticket By Pax Name" class="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <button class="bg-blue-600 text-white p-2 rounded-r hover:bg-blue-700 transition duration-200">Search</button>
+                                </div>
+                                <div class="flex items-center">
+                                     <select class="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Select Foreign account</option>
+                                        </select>
+                                      <button class="bg-blue-600 text-white p-2 rounded-r hover:bg-blue-700 transition duration-200">View</button>
+                                </div>
+                                <div class="flex items-center">
+                                     <select class="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Select Users</option>
+                                        </select>
+                                      <button class="bg-blue-600 text-white p-2 rounded-r hover:bg-blue-700 transition duration-200">User Wise</button>
+                                </div>
+
+                                <div class="flex items-center">
+                                    <input type="text" placeholder="Search Ticket By PNR" class="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <button class="bg-blue-600 text-white p-2 rounded-r hover:bg-blue-700 transition duration-200">Search</button>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="text" placeholder="Search by Voucher No" class="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <button class="bg-blue-600 text-white p-2 rounded-r hover:bg-blue-700 transition duration-200">View</button>
+                                </div>
+                                <div class="flex items-center">
+                                     <select class="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Select Multi account</option>
+                                        </select>
+                                      <button class="bg-blue-600 text-white p-2 rounded-r hover:bg-blue-700 transition duration-200">Invoice</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                            <div class="report-category-card">
+                                <h3 class="text-xl font-semibold mb-4 text-green-700">Financial Report</h3>
+                                <a href="#" @click.prevent="currentPage = 'expenses-report'" class="report-link"><span>Expenses Report</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'income-report'" class="report-link"><span>Income Report</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'monthly-profit-loss'" class="report-link"><span>Monthly Profit Loss</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'daily-sales-report'" class="report-link"><span>Daily Sales Report</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" class="report-link"><span>Romamcha</span> <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+
+                            <div class="report-category-card">
+                                <h3 class="text-xl font-semibold mb-4 text-green-700">Sales Report</h3>
+                                <a href="#" @click.prevent="currentPage = 'top-customer-sales'" class="report-link"><span>Top Customer Sales</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = '5-year-customer-sales'" class="report-link"><span>5 Year Customer Sales</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'top-suppliers-sales'" class="report-link"><span>Top Suppliers Sales</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'top-agent-sales'" class="report-link"><span>Top Agent Sales</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'top-airlines-sales'" class="report-link"><span>Top Airlines Sales</span> <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+
+                             <div class="report-category-card">
+                                <h3 class="text-xl font-semibold mb-4 text-green-700">Airline Ticket Reports</h3>
+                                <a href="#" @click.prevent="currentPage = 'bsp-report'" class="report-link"><span>BSP Report</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'airline-sale-report'" class="report-link"><span>Airline Sale Report</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'airline-comparison-report'" class="report-link"><span>Airline Comparison Report</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'ticket-sale-register'" class="report-link"><span>Ticket Sale Register</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'supplier-wise-purchases'" class="report-link"><span>Supplier Wise Purchases</span> <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+
+                             <div class="report-category-card">
+                                <h3 class="text-xl font-semibold mb-4 text-green-700">Hotel & Visa Reports</h3>
+                                <a href="#" @click.prevent="currentPage = 'hotel-sale-register'" class="report-link"><span>Hotel Sale Register</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'hotel-supplier-report'" class="report-link"><span>Hotel Supplier Report</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'visa-sale-register'" class="report-link"><span>Visa Sale Register</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'visa-supplier-report'" class="report-link"><span>Visa Supplier Report</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'other-services-register'" class="report-link"><span>Other Services Register</span> <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+
+                             <div class="report-category-card">
+                                <h3 class="text-xl font-semibold mb-4 text-green-700">Foreign Payment / Rcpt</h3>
+                                <a href="#" @click.prevent="currentPage = 'entry-foreign-payment'" class="report-link"><span>Entry Foreign Payment</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'view-foreign-payment'" class="report-link"><span>View Foreign Payment</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'entry-foreign-receipt'" class="report-link"><span>Entry Foreign Receipt</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'view-foreign-receipt'" class="report-link"><span>View Foreign Receipt</span> <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+
+                             <div class="report-category-card">
+                                <h3 class="text-xl font-semibold mb-4 text-green-700">Business Report</h3>
+                                <a href="#" @click.prevent="currentPage = 'customer-sale-report'" class="report-link"><span>Customer Sale Report</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'supplier-sale-report'" class="report-link"><span>Supplier Sale Report</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'travel-agent-wise-sale-report'" class="report-link"><span>Travel Agent Wise Sale Report</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'comprehensive-sale-report'" class="report-link"><span>Comprehensive Sale Report</span> <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+
+                             <div class="report-category-card">
+                                <h3 class="text-xl font-semibold mb-4 text-green-700">Cash & Bank</h3>
+                                <a href="#" @click.prevent="currentPage = 'daily-cash-activity'" class="report-link"><span>Daily Cash Activity</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'daily-cash-book'" class="report-link"><span>Daily Cash Book</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'banks-balances'" class="report-link"><span>Banks Balances</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" class="report-link"><span>Romamcha</span> <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+
+                             <div class="report-category-card">
+                                <h3 class="text-xl font-semibold mb-4 text-green-700">Admin</h3>
+                                <a href="#" @click.prevent="currentPage = 'create-user'" :class="{'active': currentPage === 'create-user'}" class="report-link"><span>Create User</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'manage-users'" :class="{'active': currentPage === 'manage-users'}" class="report-link"><span>Manage Users</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'company-profile'" class="report-link"><span>Company Profile</span> <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="#" @click.prevent="currentPage = 'add-consultant'" class="report-link"><span>Add Consultant</span> <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div v-else-if="currentPage === 'accounts'" key="accounts">
+                        <h2 class="text-3xl font-semibold mb-6">Accounts Management</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-xl font-medium mb-4">Foreign Payments & Receipts</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div>
+                                    <label for="account-type" class="block text-sm font-medium text-gray-700">Account Type</label>
+                                    <select id="account-type" v-model="newTransaction.type" class="mt-1 block w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Select Type</option>
+                                        <option value="payment">Payment</option>
+                                        <option value="receipt">Receipt</option>
+                                    </select>
+                                </div>
+                                 <div>
+                                    <label for="account-name" class="block text-sm font-medium text-gray-700">Account Name</label>
+                                    <input type="text" id="account-name" v-model="newTransaction.account" class="mt-1 block w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                 <div>
+                                    <label for="amount" class="block text-sm font-medium text-gray-700">Amount</label>
+                                    <input type="number" id="amount" v-model="newTransaction.amount" class="mt-1 block w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                 <div>
+                                    <label for="currency" class="block text-sm font-medium text-gray-700">Currency</label>
+                                    <input type="text" id="currency" v-model="newTransaction.currency" class="mt-1 block w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+                             <button @click="addTransaction" class="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition duration-200">Add Transaction</button>
+
+                             <div class="mt-8">
+                                <h4 class="text-lg font-medium mb-4">Recent Transactions</h4>
+                                 <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Account</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Currency</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        <tr v-for="(transaction, index) in transactions" :key="index">
+                                            <td class="px-6 py-4 whitespace-nowrap">{{ transaction.type }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">{{ transaction.account }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">{{ transaction.amount.toFixed(2) }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">{{ transaction.currency }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <button @click="editTransaction(index)" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                                                <button @click="deleteTransaction(index)" class="text-red-600 hover:text-red-900">Delete</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                 </table>
+                             </div>
+                        </div>
+                    </div>
+
+                    <div v-else-if="currentPage === 'financial-reports'" key="financial-reports">
+                        <h2 class="text-3xl font-semibold mb-6">Financial Reports Overview</h2>
+                         <p class="text-gray-700">Select a specific financial report from the sidebar or dashboard.</p>
+                         </div>
+
+                    <div v-else-if="currentPage === 'ticket-vouchers'" key="ticket-vouchers">
+                        <h2 class="text-3xl font-semibold mb-6">Ticket Vouchers</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-xl font-medium mb-4">Add/Edit Ticket Voucher</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div>
+                                    <label for="pnr" class="block text-sm font-medium text-gray-700">PNR</label>
+                                    <input type="text" id="pnr" v-model="newTicket.pnr" class="mt-1 block w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                 <div>
+                                    <label for="customer-name" class="block text-sm font-medium text-gray-700">Customer Name</label>
+                                    <input type="text" id="customer-name" v-model="newTicket.customerName" class="mt-1 block w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                 <div>
+                                    <label for="ticket-number" class="block text-sm font-medium text-gray-700">Ticket Number</label>
+                                    <input type="text" id="ticket-number" v-model="newTicket.ticketNumber" class="mt-1 block w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                 <div>
+                                    <label for="amount" class="block text-sm font-medium text-gray-700">Amount</label>
+                                    <input type="number" id="amount" v-model="newTicket.amount" class="mt-1 block w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+                             <button @click="addTicket" class="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition duration-200">Add Ticket Voucher</button>
+
+                             <div class="mt-8">
+                                <h4 class="text-lg font-medium mb-4">Ticket Vouchers List</h4>
+                                 <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PNR</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer Name</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ticket Number</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        <tr v-for="(ticket, index) in tickets" :key="index">
+                                            <td class="px-6 py-4 whitespace-nowrap">{{ ticket.pnr }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">{{ ticket.customerName }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">{{ ticket.ticketNumber }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">{{ ticket.amount.toFixed(2) }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <button @click="editTicket(index)" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                                                <button @click="deleteTicket(index)" class="text-red-600 hover:text-red-900">Delete</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                 </table>
+                             </div>
+                        </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'admin-panel'" key="admin-panel">
+                        <h2 class="text-3xl font-semibold mb-6">Admin Panel</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-xl font-medium mb-4">Manage Users</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div>
+                                    <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                                    <input type="text" id="username" v-model="newUser.username" class="mt-1 block w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                 <div>
+                                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                                    <input type="password" id="password" v-model="newUser.password" class="mt-1 block w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                 <div>
+                                    <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
+                                    <select id="role" v-model="newUser.role" class="mt-1 block w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="admin">Admin</option>
+                                        <option value="user">User</option>
+                                    </select>
+                                </div>
+                            </div>
+                             <button @click="addUser" class="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition duration-200">Add User</button>
+
+                             <div class="mt-8">
+                                <h4 class="text-lg font-medium mb-4">Users List</h4>
+                                 <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        <tr v-for="(user, index) in users" :key="index">
+                                            <td class="px-6 py-4 whitespace-nowrap">{{ user.username }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">{{ user.role }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <button @click="editUser(index)" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                                                <button @click="deleteUser(index)" class="text-red-600 hover:text-red-900">Delete</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                 </table>
+                             </div>
+
+                             <div class="mt-8">
+                                 <h4 class="text-lg font-medium mb-4">Activity Logs</h4>
+                                 <p class="text-gray-600">Activity logs will be displayed here...</p>
+                                 </div>
+                        </div>
+                    </div>
+
+                    <div v-else-if="currentPage === 'chart-of-accounts'" key="chart-of-accounts">
+                        <h2 class="text-3xl font-semibold mb-6">Chart of Accounts</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Chart of Accounts will go here.</p>
+                             </div>
+                    </div>
+
+                    <div v-else-if="currentPage === 'accounts-ledger'" key="accounts-ledger">
+                        <h2 class="text-3xl font-semibold mb-6">Accounts Ledger</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Accounts Ledger will go here.</p>
+                             </div>
+                    </div>
+
+                    <div v-else-if="currentPage === 'foreign-accounts'" key="foreign-accounts">
+                        <h2 class="text-3xl font-semibold mb-6">Foreign Accounts</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Foreign Accounts will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'trial-balance'" key="trial-balance">
+                        <h2 class="text-3xl font-semibold mb-6">Trial Balance</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Trial Balance will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'cash-activities'" key="cash-activities">
+                        <h2 class="text-3xl font-semibold mb-6">Cash Activities</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Cash Activities will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'closings'" key="closings">
+                        <h2 class="text-3xl font-semibold mb-6">Closings</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Closings will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'add'" key="add">
+                        <h2 class="text-3xl font-semibold mb-6">Add New Entry</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Select the type of entry to add (e.g., Voucher, Transaction).</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'expenses-report'" key="expenses-report">
+                        <h2 class="text-3xl font-semibold mb-6">Expenses Report</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Expenses Report will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'income-report'" key="income-report">
+                        <h2 class="text-3xl font-semibold mb-6">Income Report</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Income Report will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'monthly-profit-loss'" key="monthly-profit-loss">
+                        <h2 class="text-3xl font-semibold mb-6">Monthly Profit Loss</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Monthly Profit Loss will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'daily-sales-report'" key="daily-sales-report">
+                        <h2 class="text-3xl font-semibold mb-6">Daily Sales Report</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Daily Sales Report will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'top-customer-sales'" key="top-customer-sales">
+                        <h2 class="text-3xl font-semibold mb-6">Top Customer Sales</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Top Customer Sales will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === '5-year-customer-sales'" key="5-year-customer-sales">
+                        <h2 class="text-3xl font-semibold mb-6">5 Year Customer Sales</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for 5 Year Customer Sales will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'top-suppliers-sales'" key="top-suppliers-sales">
+                        <h2 class="text-3xl font-semibold mb-6">Top Suppliers Sales</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Top Suppliers Sales will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'top-agent-sales'" key="top-agent-sales">
+                        <h2 class="text-3xl font-semibold mb-6">Top Agent Sales</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Top Agent Sales will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'top-airlines-sales'" key="top-airlines-sales">
+                        <h2 class="text-3xl font-semibold mb-6">Top Airlines Sales</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Top Airlines Sales will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'bsp-report'" key="bsp-report">
+                        <h2 class="text-3xl font-semibold mb-6">BSP Report</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for BSP Report will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'airline-sale-report'" key="airline-sale-report">
+                        <h2 class="text-3xl font-semibold mb-6">Airline Sale Report</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Airline Sale Report will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'airline-comparison-report'" key="airline-comparison-report">
+                        <h2 class="text-3xl font-semibold mb-6">Airline Comparison Report</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Airline Comparison Report will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'ticket-sale-register'" key="ticket-sale-register">
+                        <h2 class="text-3xl font-semibold mb-6">Ticket Sale Register</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Ticket Sale Register will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'supplier-wise-purchases'" key="supplier-wise-purchases">
+                        <h2 class="text-3xl font-semibold mb-6">Supplier Wise Purchases</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Supplier Wise Purchases will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'hotel-sale-register'" key="hotel-sale-register">
+                        <h2 class="text-3xl font-semibold mb-6">Hotel Sale Register</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Hotel Sale Register will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'hotel-supplier-report'" key="hotel-supplier-report">
+                        <h2 class="text-3xl font-semibold mb-6">Hotel Supplier Report</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Hotel Supplier Report will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'visa-sale-register'" key="visa-sale-register">
+                        <h2 class="text-3xl font-semibold mb-6">Visa Sale Register</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Visa Sale Register will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'visa-supplier-report'" key="visa-supplier-report">
+                        <h2 class="text-3xl font-semibold mb-6">Visa Supplier Report</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Visa Supplier Report will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'other-services-register'" key="other-services-register">
+                        <h2 class="text-3xl font-semibold mb-6">Other Services Register</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Other Services Register will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'entry-foreign-payment'" key="entry-foreign-payment">
+                        <h2 class="text-3xl font-semibold mb-6">Entry Foreign Payment</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Form for entering foreign payments will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'view-foreign-payment'" key="view-foreign-payment">
+                        <h2 class="text-3xl font-semibold mb-6">View Foreign Payment</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for viewing foreign payments will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'entry-foreign-receipt'" key="entry-foreign-receipt">
+                        <h2 class="text-3xl font-semibold mb-6">Entry Foreign Receipt</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Form for entering foreign receipts will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'view-foreign-receipt'" key="view-foreign-receipt">
+                        <h2 class="text-3xl font-semibold mb-6">View Foreign Receipt</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for viewing foreign receipts will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'customer-sale-report'" key="customer-sale-report">
+                        <h2 class="text-3xl font-semibold mb-6">Customer Sale Report</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Customer Sale Report will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'supplier-sale-report'" key="supplier-sale-report">
+                        <h2 class="text-3xl font-semibold mb-6">Supplier Sale Report</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Supplier Sale Report will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'travel-agent-wise-sale-report'" key="travel-agent-wise-sale-report">
+                        <h2 class="text-3xl font-semibold mb-6">Travel Agent Wise Sale Report</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Travel Agent Wise Sale Report will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'comprehensive-sale-report'" key="comprehensive-sale-report">
+                        <h2 class="text-3xl font-semibold mb-6">Comprehensive Sale Report</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Comprehensive Sale Report will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'daily-cash-activity'" key="daily-cash-activity">
+                        <h2 class="text-3xl font-semibold mb-6">Daily Cash Activity</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Daily Cash Activity will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'daily-cash-book'" key="daily-cash-book">
+                        <h2 class="text-3xl font-semibold mb-6">Daily Cash Book</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Daily Cash Book will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'banks-balances'" key="banks-balances">
+                        <h2 class="text-3xl font-semibold mb-6">Banks Balances</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Banks Balances will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'create-user'" key="create-user">
+                        <h2 class="text-3xl font-semibold mb-6">Create User</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Form for creating a new user will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'manage-users'" key="manage-users">
+                        <h2 class="text-3xl font-semibold mb-6">Manage Users</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for managing users will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'company-profile'" key="company-profile">
+                        <h2 class="text-3xl font-semibold mb-6">Company Profile</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Company Profile settings will go here.</p>
+                             </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'add-consultant'" key="add-consultant">
+                        <h2 class="text-3xl font-semibold mb-6">Add Consultant</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Form for adding a new consultant will go here.</p>
+                             </div>
+                    </div>
+
+                    <div v-else-if="currentPage === 'finance-vouchers'" key="finance-vouchers">
+                        <h2 class="text-3xl font-semibold mb-6">Finance Vouchers</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Finance Vouchers will go here.</p>
+                        </div>
+                    </div>
+
+                    <div v-else-if="currentPage === 'ticket-voucher'" key="ticket-voucher">
+                        <h2 class="text-3xl font-semibold mb-6">Ticket Voucher</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Ticket Voucher will go here.</p>
+                        </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'hotel-vouchers'" key="hotel-vouchers">
+                        <h2 class="text-3xl font-semibold mb-6">Hotel Vouchers</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Hotel Vouchers will go here.</p>
+                        </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'visa-voucher'" key="visa-voucher">
+                        <h2 class="text-3xl font-semibold mb-6">Visa Voucher</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Visa Voucher will go here.</p>
+                        </div>
+                    </div>
+
+                     <div v-else-if="currentPage === 'package-voucher'" key="package-voucher">
+                        <h2 class="text-3xl font-semibold mb-6">Package Voucher</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Package Voucher will go here.</p>
+                        </div>
+                    </div>
+
+                    <div v-else-if="currentPage === 'other-voucher'" key="other-voucher">
+                        <h2 class="text-3xl font-semibold mb-6">Other Voucher</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <p class="text-gray-700">Content for Other Voucher will go here.</p>
+                        </div>
+                    </div>
+
+
+                </transition>
+            </main>
+        </div>
+
+        <footer class="bg-gray-800 text-white p-4 text-center text-sm">
+            <div class="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-8">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-envelope"></i>
+                    <span>shiwanitravelandtours@gmail.com</span>
+                </div>
+                 <div class="flex items-center space-x-2">
+                    <i class="fab fa-facebook-f"></i>
+                    <span>Shiwani Travel & Tours</span>
+                </div>
+                 <div class="flex items-center space-x-2">
+                    <i class="fas fa-phone"></i>
+                    <span>03009262660</span>
+                </div>
+                 <div class="flex items-center space-x-2">
+                     <i class="fab fa-whatsapp"></i>
+                    <a href="https://wa.me/923309262660" target="_blank" class="text-white hover:underline">wa.me/=923309262660</a>
+                </div>
+                 <div>
+                    <span>www.evoucher.pk</span>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                currentPage: 'home', // Controls which page is displayed
+                searchQuery: '', // For the quick search bar
+                // Sample data - replace with actual data fetching/storage
+                totalSales: 127500.00, // Updated based on screenshot
+                ticketSales: 0.00, // Updated based on screenshot
+                hotelSales: 127500.00, // Updated based on screenshot
+                visaSales: 0.00, // Updated based on screenshot
+                packageSales: 0.00, // Placeholder
+                transactions: [ // Sample transactions
+                    { type: 'receipt', account: 'Client A', amount: 5000, currency: 'USD' },
+                    { type: 'payment', account: 'Supplier B', amount: 2000, currency: 'EUR' }
+                ],
+                newTransaction: { // For adding new transactions
+                    type: '',
+                    account: '',
+                    amount: 0,
+                    currency: ''
+                },
+                tickets: [ // Sample tickets
+                    { pnr: 'ABC123', customerName: 'John Doe', ticketNumber: '123-4567890', amount: 500 },
+                    { pnr: 'DEF456', customerName: 'Jane Smith', ticketNumber: '987-6543210', amount: 350 }
+                ],
+                 newTicket: { // For adding new tickets
+                    pnr: '',
+                    customerName: '',
+                    ticketNumber: '',
+                    amount: 0
+                },
+                users: [ // Sample users
+                    { username: 'admin', role: 'admin' },
+                    { username: 'user1', role: 'user' }
+                ],
+                newUser: { // For adding new users
+                    username: '',
+                    password: '',
+                    role: 'user'
+                },
+                reportFilters: { // For financial report filters
+                    startDate: '',
+                    endDate: ''
+                },
+                charts: {} // To store Chart.js instances
+            },
+            methods: {
+                // Method to add a new transaction
+                addTransaction() {
+                    if (this.newTransaction.type && this.newTransaction.account && this.newTransaction.amount > 0 && this.newTransaction.currency) {
+                        this.transactions.push({...this.newTransaction});
+                        // Reset form
+                        this.newTransaction = { type: '', account: '', amount: 0, currency: '' };
+                        // In a real app, you would save this to a backend/database
+                        console.log("Transaction added:", this.transactions);
+                    } else {
+                        alert("Please fill in all transaction details."); // Basic error handling
+                    }
+                },
+                // Method to edit a transaction (placeholder)
+                editTransaction(index) {
+                    console.log("Edit transaction at index:", index);
+                    // Implement edit logic here (e.g., populate form with data)
+                },
+                // Method to delete a transaction
+                deleteTransaction(index) {
+                    if (confirm("Are you sure you want to delete this transaction?")) {
+                        this.transactions.splice(index, 1);
+                         console.log("Transaction deleted:", this.transactions);
+                    }
+                },
+                 // Method to add a new ticket
+                addTicket() {
+                    if (this.newTicket.pnr && this.newTicket.customerName && this.newTicket.ticketNumber && this.newTicket.amount > 0) {
+                        this.tickets.push({...this.newTicket});
+                        // Reset form
+                        this.newTicket = { pnr: '', customerName: '', ticketNumber: '', amount: 0 };
+                         // In a real app, you would save this to a backend/database
+                        console.log("Ticket added:", this.tickets);
+                    } else {
+                        alert("Please fill in all ticket details."); // Basic error handling
+                    }
+                },
+                 // Method to edit a ticket (placeholder)
+                editTicket(index) {
+                     console.log("Edit ticket at index:", index);
+                    // Implement edit logic here
+                },
+                 // Method to delete a ticket
+                deleteTicket(index) {
+                    if (confirm("Are you sure you want to delete this ticket?")) {
+                        this.tickets.splice(index, 1);
+                         console.log("Ticket deleted:", this.tickets);
+                    }
+                },
+                 // Method to add a new user
+                addUser() {
+                    if (this.newUser.username && this.newUser.password) {
+                        this.users.push({...this.newUser});
+                        // Reset form
+                        this.newUser = { username: '', password: '', role: 'user' };
+                         // In a real app, you would save this to a backend/database
+                         console.log("User added:", this.users);
+                    } else {
+                        alert("Please enter username and password."); // Basic error handling
+                    }
+                },
+                 // Method to edit a user (placeholder)
+                editUser(index) {
+                    console.log("Edit user at index:", index);
+                    // Implement edit logic here
+                },
+                 // Method to delete a user
+                deleteUser(index) {
+                     if (confirm("Are you sure you want to delete this user?")) {
+                        this.users.splice(index, 1);
+                        console.log("User deleted:", this.users);
+                    }
+                },
+                 // Method to generate reports (placeholder)
+                generateReports() {
+                    console.log("Generating reports with filters:", this.reportFilters);
+                    // In a real app, you would fetch data based on filters and update charts
+                    this.renderCharts(); // Re-render charts with potentially new data
+                },
+                // Method to render Chart.js charts
+                renderCharts() {
+                    // Destroy existing charts if they exist
+                    if (this.charts.profitLoss) this.charts.profitLoss.destroy();
+                    if (this.charts.salesDistribution) this.charts.salesDistribution.destroy();
+
+                    // Profit & Loss Chart (Sample Data) - Now rendered on financial-reports page
+                    const ctxProfitLoss = document.getElementById('profitLossChart');
+                    if (ctxProfitLoss) {
+                        this.charts.profitLoss = new Chart(ctxProfitLoss, {
+                            type: 'bar',
+                            data: {
+                                labels: ['Income', 'Expenses', 'Profit'],
+                                datasets: [{
+                                    label: 'Amount ($)',
+                                    data: [this.totalSales, this.totalSales - 5000, 5000], // Sample data based on total sales
+                                    backgroundColor: ['#4CAF50', '#F44336', '#2196F3'],
+                                    borderColor: ['#388E3C', '#D32F2F', '#1976D2'],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+
+                    // Sales Distribution Chart (Sample Data) - Now rendered on financial-reports page
+                    const ctxSalesDistribution = document.getElementById('salesDistributionChart');
+                     if (ctxSalesDistribution) {
+                        this.charts.salesDistribution = new Chart(ctxSalesDistribution, {
+                            type: 'pie',
+                            data: {
+                                labels: ['Tickets', 'Hotels', 'Visas', 'Packages'],
+                                datasets: [{
+                                    label: 'Sales Amount ($)',
+                                    data: [this.ticketSales, this.hotelSales, this.visaSales, this.packageSales], // Using sample data from Vue instance
+                                    backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0'],
+                                    hoverBackgroundColor: ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0']
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                            }
+                        });
+                    }
+                }
+            },
+            watch: {
+                // Watch for changes in currentPage to potentially render charts
+                currentPage(newValue, oldValue) {
+                    // Charts are now primarily linked from the dashboard, so rendering logic might change
+                    // If you add charts to the new report pages, you would add conditions here
+                    console.log(`Navigating from ${oldValue} to ${newValue}`);
+                }
+            },
+            mounted() {
+                // Initial chart render is no longer needed on mount for the home page
+                // If you add charts to specific report pages, call renderCharts when those pages are active
+            }
+        });
+    </script>
+
+</body>
+</html>
